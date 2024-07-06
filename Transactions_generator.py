@@ -117,9 +117,27 @@ def process_transactions(input_dir, output_file):
     transaction_df = transaction_df.sort_values(by="EpochTime")
     transaction_df = transaction_df.drop(columns=["EpochTime"])
 
+    transaction_df["Amount"] = pd.to_numeric(transaction_df["Amount"])
+
+    # Sum the "Amount" column
+    total_amount = transaction_df["Amount"].sum()
+
+    # Create a new row with the sum of the "Amount" column
+    new_row = {
+        "Date": [""],
+        "Time": [""],
+        "Transaction ID":[""],
+        "UTR": ["Total"],
+        "Amount": [total_amount]
+    }
+
+    df_total = pd.DataFrame(new_row)
+    # Append the new row to the DataFrame
+    transaction_df = pd.concat([transaction_df, df_total], ignore_index=True)
+
     transaction_df.to_excel(output_file, index=False)
     create_docx_file(transaction_df, output_file)
-    messagebox.showinfo("Success", f"Transactions have been processed and saved to {output_file}")
+    messagebox.showinfo("Success", f"Transactihttps://chatgpt.com/c/948f65dc-e91a-4900-af25-90a6c67fbe55ons have been processed and saved to {output_file}")
 
 
 def select_input_directory():

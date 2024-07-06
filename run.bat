@@ -1,2 +1,2 @@
 @echo off
-python Transactions_generator.py
+py Transactions_generator.py
