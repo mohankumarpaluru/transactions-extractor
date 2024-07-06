@@ -7,6 +7,8 @@ from tkinter import filedialog, messagebox, ttk
 import pandas as pd
 import pytesseract
 import sv_ttk
+from docx import Document
+from docx.shared import Inches
 from PIL import Image
 
 # Path to tesseract executable (change this if necessary)
@@ -23,6 +25,28 @@ def get_image_files(directory):
     ]
     return image_files
 
+def create_docx_file(df, output_file):
+    doc = Document()
+    doc.styles['Normal'].font.name = 'Aptos'
+
+    # Step 3: Add a title to the document
+    doc.add_heading('something here', level=1)
+    # Step 4: Add the DataFrame as a table
+    table = doc.add_table(rows=1, cols=len(df.columns))
+    table.style = 'Table Grid'
+    # Step 5: Add the header row
+    hdr_cells = table.rows[0].cells
+    for i, column in enumerate(df.columns):
+        hdr_cells[i].text = column
+
+    # Step 6: Add the DataFrame data to the table
+    for index, row in df.iterrows():
+        row_cells = table.add_row().cells
+        for i, cell in enumerate(row):
+            row_cells[i].text = str(cell)
+
+    # Step 7: Save the document
+    doc.save(output_file.replace(".xlsx", '.docx'))
 
 def process_image(image_path):
     # Open the image file
@@ -94,6 +118,7 @@ def process_transactions(input_dir, output_file):
     transaction_df = transaction_df.drop(columns=["EpochTime"])
 
     transaction_df.to_excel(output_file, index=False)
+    create_docx_file(transaction_df, output_file)
     messagebox.showinfo("Success", f"Transactions have been processed and saved to {output_file}")
 
 
